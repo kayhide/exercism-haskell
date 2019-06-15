@@ -1,10 +1,9 @@
 module Pangram (isPangram) where
 
-import           Data.Char  (toLower)
-import           Data.List  (find, scanl')
-import           Data.Maybe (isJust)
-import           Data.Set   (Set)
-import qualified Data.Set   as Set
+import           Data.Char (toLower)
+import           Data.List (scanl')
+import           Data.Set  (Set)
+import qualified Data.Set  as Set
 
 
 -- | Alphabets you are looking for.
@@ -18,7 +17,7 @@ targets = ['a' .. 'z']
 -- sentence.
 -- If targets get empty, it terminates immediately.
 isPangram :: String -> Bool
-isPangram = isJust . find null . scanl' go (Set.fromList targets)
+isPangram = or . fmap null . scanl' go (Set.fromList targets)
   where
     go :: Set Char -> Char -> Set Char
     go chars c = Set.delete (toLower c) chars
