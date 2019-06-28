@@ -1,10 +1,8 @@
-{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns      #-}
 module Bob (responseFor) where
 
-import           Data.Bool (bool)
-import           Data.Char (isDigit, isLower, isSpace, isUpper)
+import           Data.Char (isDigit, isLower, isUpper)
 import           Data.Text (Text)
 import qualified Data.Text as T
 
