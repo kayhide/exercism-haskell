@@ -5,7 +5,9 @@ dependencies:
   - base
 
 library:
-  exposed-modules: Bob
+  exposed-modules:
+    - Bob
+    - SimpleBob
   source-dirs: src
   ghc-options: -Wall
   dependencies:
