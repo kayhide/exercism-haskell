@@ -14,5 +14,5 @@ classify x = toClassification . compare x . sum <$> factors x
 
 factors :: Int -> Maybe [Int]
 factors x
-  | x > 0 = Just $ filter ((== 0) . mod x) [1 .. (x - 1)]
-  | otherwise = Nothing
+  | x <= 0 = Nothing
+  | otherwise = Just $ filter ((== 0) . mod x) [1 .. x `div` 2]
