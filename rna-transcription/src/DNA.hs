@@ -1,10 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 module DNA (toRNA) where
 
-import Control.Applicative
 
 toRNA :: String -> Either Char String
-toRNA = foldr (liftA2 (:)) (Right "") . fmap turn'
+toRNA = traverse turn'
 
 turn' :: Char -> Either Char Char
 turn' = \case
