@@ -5,10 +5,13 @@ import Data.Char (isDigit)
 import Data.List (group, span)
 
 decode :: String -> String
-decode text = case span isDigit text of
-  ([], x : xs) -> x : decode xs
-  (n, x : xs)  -> replicate (read n) x <> decode xs
-  _            -> []
+decode = f . span isDigit
+  where
+    f :: (String, String) -> String
+    f = \case
+      ([], x : xs) -> x : decode xs
+      (ds, x : xs) -> replicate (read ds) x <> decode xs
+      _            -> []
 
 
 encode :: String -> String
@@ -16,6 +19,6 @@ encode = concatMap f . group
   where
     f :: String -> String
     f = \case
-      []  -> []
-      [x] -> pure x
-      xs  -> show (length xs) <> take 1 xs
+      []         -> []
+      xs@[_]     -> xs
+      xs@(x : _) -> show (length xs) <> [x]
