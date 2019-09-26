@@ -8,7 +8,8 @@ library:
   exposed-modules: SumOfMultiples
   source-dirs: src
   ghc-options: -Wall
-  # dependencies:
+  dependencies:
+    - containers
   # - foo       # List here the packages you
   # - bar       # want to use in your solution.
 
