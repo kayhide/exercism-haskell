@@ -12,18 +12,14 @@ module LinkedList
     , toList
     ) where
 
-data LinkedList a = Nil | Cons a (LinkedList a)
+import Data.List (foldl')
+
+data LinkedList a = Nil | Cons { datum :: a, next :: LinkedList a }
   deriving (Eq, Show, Foldable)
 
-datum :: LinkedList a -> a
-datum = \case
-  Nil -> error "No element"
-  Cons x _ -> x
 
 fromList :: [a] -> LinkedList a
-fromList = \case
-  [] -> Nil
-  x : xs -> Cons x $ fromList xs
+fromList = foldr Cons Nil
 
 isNil :: LinkedList a -> Bool
 isNil = \case
@@ -33,16 +29,11 @@ isNil = \case
 new :: a -> LinkedList a -> LinkedList a
 new = Cons
 
-next :: LinkedList a -> LinkedList a
-next = \case
-  Nil -> Nil
-  Cons _ xs -> xs
-
 nil :: LinkedList a
 nil = Nil
 
 reverseLinkedList :: LinkedList a -> LinkedList a
-reverseLinkedList = foldl (flip Cons) Nil
+reverseLinkedList = foldl' (flip Cons) Nil
 
 toList :: LinkedList a -> [a]
 toList = foldr (:) []
