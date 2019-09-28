@@ -1,7 +1,5 @@
 module Grains (square, total) where
 
-import Data.Coerce (coerce)
-import Data.Monoid (Sum (..))
 import Safe (atMay)
 
 
@@ -11,7 +9,7 @@ square n
  | otherwise = Nothing
 
 total :: Integer
-total = getSum . mconcat . coerce $ take 64 nums
+total = sum $ take 64 nums
 
 
 nums :: [Integer]
