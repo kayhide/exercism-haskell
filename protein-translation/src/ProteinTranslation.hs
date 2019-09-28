@@ -6,10 +6,10 @@ import Data.List (unfoldr)
 
 
 proteins :: String -> Maybe [String]
-proteins = fmap (fmap show . takeWhile (/= Stop)) . traverse parseCodon . chunksOf 3
+proteins = fmap (fmap show . takeWhile (/= Stop)) . traverse parseProtein . chunksOf 3
 
 
-data Codon
+data Protein
   = Methionine
   | Phenylalanine
   | Leucine
@@ -20,8 +20,8 @@ data Codon
   | Stop
   deriving (Eq, Show)
 
-parseCodon :: String -> Maybe Codon
-parseCodon = \case
+parseProtein :: String -> Maybe Protein
+parseProtein = \case
   "AUG" -> Just Methionine
   "UUU" -> Just Phenylalanine
   "UUC" -> Just Phenylalanine
@@ -43,8 +43,8 @@ parseCodon = \case
 
 
 chunksOf :: Int -> [a] -> [[a]]
-chunksOf n = unfoldr (splitAt' n)
+chunksOf n = unfoldr splitAt'
   where
-    splitAt' :: Int -> [a] -> Maybe ([a], [a])
-    splitAt' n xs = case splitAt n xs of
+    splitAt' :: [a] -> Maybe ([a], [a])
+    splitAt' xs = case splitAt n xs of
       res@(xs', _) -> bool Nothing (Just res) $ length xs' == n
