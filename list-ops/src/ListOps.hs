@@ -33,18 +33,13 @@ reverse :: [a] -> [a]
 reverse = foldl' (flip (:)) []
 
 map :: (a -> b) -> [a] -> [b]
-map f = \case
-  [] -> []
-  x : xs -> f x : map f xs
+map f = foldr (\x xs -> f x : xs) []
 
 filter :: (a -> Bool) -> [a] -> [a]
-filter p = \case
-  [] -> []
-  x : xs -> bool id (x :) (p x) $ filter p xs
+filter p = foldr (\x xs -> bool xs (x : xs) (p x)) []
 
 (++) :: [a] -> [a] -> [a]
-[] ++ ys = ys
-(x : xs) ++ ys = x : (xs ++ ys)
+xs ++ ys = foldr (:) ys xs
 
 concat :: [[a]] -> [a]
 concat = foldr (++) []
