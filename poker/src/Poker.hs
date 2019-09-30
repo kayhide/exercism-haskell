@@ -47,11 +47,11 @@ toCard = \case
 
 toHand :: [Card] -> Hand
 toHand cards = case sortOn (Down . length) $ group nums of
-  x@[_, _, _, _] : xs           -> FourOfAKind $ x <> concat xs
-  x1@[_, _, _] : x2@[_, _] : xs -> FullHouse $ x1 <> x2 <> concat xs
-  x1@[_, _] : x2@[_, _] : xs    -> TwoPair $ x1 <> x2 <> concat xs
-  x@[_, _, _] : xs              -> ThreeOfAKind $ x <> concat xs
-  x@[_, _] : xs                 -> OnePair $ x <> concat xs
+  xss@([_, _, _, _] : _)       -> FourOfAKind $ concat xss
+  xss@([_, _, _] : [_, _] : _) -> FullHouse $ concat xss
+  xss@([_, _, _] : _)          -> ThreeOfAKind $ concat xss
+  xss@([_, _] : [_, _] : _)    -> TwoPair $ concat xss
+  xss@([_, _] : _)             -> OnePair $ concat xss
 
   _ -> case (isStraight, isFlush) of
     (Just nums', True)  -> StraightFlush nums'
