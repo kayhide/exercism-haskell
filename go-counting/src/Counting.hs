@@ -5,11 +5,13 @@ module Counting (
     territoryFor
 ) where
 
+import Control.Arrow (first, second)
+import Control.Monad (guard)
 import Control.Monad.State (State, execState, gets)
-import Data.Bifunctor (first, second)
 import Data.Bool (bool)
 import Data.Foldable (traverse_)
 import Data.List (foldl')
+import Data.Maybe (isNothing)
 import Data.Set (Set)
 import Optics
 import Optics.State.Operators
@@ -23,11 +25,11 @@ territories :: Board -> [(Set Coord, Maybe Color)]
 territories board = foldl' f [] coords
   where
     f :: [(Set Coord, Maybe Color)] -> Coord -> [(Set Coord, Maybe Color)]
-    f org coord =
+    f acc coord =
       bool
-        (maybe org (: org) $ territoryFor board coord)
-        org
-        $ or $ org ^.. traversed % _1 % contains coord
+        (maybe acc (: acc) $ territoryFor board coord)
+        acc
+        $ or $ acc ^.. traversed % _1 % contains coord
 
     coords :: [Coord]
     coords = case board of
@@ -35,14 +37,16 @@ territories board = foldl' f [] coords
       l : _ -> (,) <$> [1 .. length l] <*> [1 .. length board]
 
 territoryFor :: Board -> Coord -> Maybe (Set Coord, Maybe Color)
-territoryFor board coord =
-  case (isInside board coord, board <!> coord) of
-    (True, Nothing) ->
-      case execState (fill board coord) (mempty, mempty) of
-        (coords, colors) -> case colors ^.. folded of
-          [c] -> Just (coords, Just c)
-          _   -> Just (coords, Nothing)
-    _ -> Nothing
+territoryFor board coord = do
+  guard $ isInside board coord
+  guard $ isNothing $ board <!> coord
+  pure $ execState (fill board coord) (mempty, mempty) & _2 %~ single
+
+  where
+    single :: Foldable f => f a -> Maybe a
+    single xs = case xs ^.. folded of
+      [x] -> Just x
+      _   -> Nothing
 
 fill :: Board -> Coord -> State (Set Coord, Set Color) ()
 fill board coord =
@@ -59,7 +63,7 @@ fill board coord =
 
 adjacents :: Board -> Coord -> [Coord]
 adjacents board (x, y) =
-  filter (isInside board) $ [first, second] <*> [subtract 1, (+ 1)] <*> [(x, y)]
+  filter (isInside board) $ [first, second] <*> [pred, succ] <*> [(x, y)]
 
 isInside :: Board -> Coord -> Bool
 isInside board (x, y) = case board of
