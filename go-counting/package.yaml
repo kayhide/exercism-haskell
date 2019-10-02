@@ -1,0 +1,24 @@
+name: go-counting
+version: 1.0.0.4
+
+dependencies:
+  - base
+  - containers
+
+library:
+  exposed-modules: Counting
+  source-dirs: src
+  ghc-options: -Wall
+  dependencies:
+    - mtl
+    - optics
+  # - foo       # List here the packages you
+  # - bar       # want to use in your solution.
+
+tests:
+  test:
+    main: Tests.hs
+    source-dirs: test
+    dependencies:
+      - go-counting
+      - hspec
