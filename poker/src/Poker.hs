@@ -2,13 +2,14 @@
 {-# LANGUAGE TupleSections #-}
 module Poker (bestHands) where
 
-import Control.Applicative ((<|>))
+import Control.Applicative ((<*), (<|>))
 import Control.Arrow ((&&&))
+import Control.Monad (guard)
 import Data.Bool (bool)
 import Data.Function (on)
-import Data.List (group, groupBy, partition, sortOn)
+import Data.List (elemIndex, group, groupBy, partition, sortOn)
 import Data.Ord (Down (..))
-import Safe (headMay, readMay)
+import Safe (headMay)
 
 
 bestHands :: [String] -> Maybe [String]
@@ -37,13 +38,12 @@ toCards = traverse toCard . words
 
 toCard :: String -> Maybe Card
 toCard = \case
-    ['A', c] -> pure (14, c)
-    ['K', c] -> pure (13, c)
-    ['Q', c] -> pure (12, c)
-    ['J', c] -> pure (11, c)
-    ['1', '0', c] -> pure (10, c)
-    [x, c] -> (,c) <$> readMay [x]
+    [x, c] -> (,c) <$> elemIndex x "__23456789_JQKA" <* guard (x /= '_' && isSuit c)
+    ['1', '0', c] -> (10, c) <$ guard (isSuit c)
     _ -> Nothing
+  where
+    isSuit :: Char -> Bool
+    isSuit = (`elem` "SHDC")
 
 toHand :: [Card] -> Hand
 toHand cards = case sortOn (Down . length) $ group nums of
