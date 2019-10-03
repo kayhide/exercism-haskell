@@ -1,0 +1,7 @@
+resolver: lts-12.4
+
+extra-deps:
+  - optics-0.1
+  - optics-core-0.1
+  - optics-extra-0.1
+  - optics-th-0.1
