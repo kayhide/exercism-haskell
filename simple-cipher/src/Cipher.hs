@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module Cipher (caesarDecode, caesarEncode, caesarEncodeRandom) where
 
 import Data.Char (chr, ord)
@@ -6,14 +5,10 @@ import System.Random (newStdGen, randomRs)
 
 
 caesarDecode :: String -> String -> String
-caesarDecode = \case
-  [k] -> fmap (unshiftBy k)
-  key -> zipWith unshiftBy (key <> repeat 'a')
+caesarDecode = zipWith unshiftBy . cycle
 
 caesarEncode :: String -> String -> String
-caesarEncode = \case
-  [k] -> fmap (shiftBy k)
-  key -> zipWith shiftBy (key <> repeat 'a')
+caesarEncode = zipWith shiftBy . cycle
 
 caesarEncodeRandom :: String -> IO (String, String)
 caesarEncodeRandom text = do
