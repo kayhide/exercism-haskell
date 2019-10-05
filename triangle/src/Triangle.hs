@@ -1,8 +1,7 @@
 module Triangle (TriangleType(..), triangleType) where
 
-import Control.Monad (guard)
+import Control.Arrow ((&&&))
 import Data.List (group, sort)
-import Data.Maybe (fromMaybe)
 
 
 data TriangleType = Equilateral
@@ -12,17 +11,15 @@ data TriangleType = Equilateral
                   deriving (Eq, Show)
 
 triangleType :: (Num a, Ord a) => a -> a -> a -> TriangleType
-triangleType a b c = fromMaybe Illegal $ categorize =<< verify (sort [a, b, c])
+triangleType a b c =
+  case (isLegal &&& length . group) $ sort [a, b, c] of
+    (True, 1) -> Equilateral
+    (True, 2) -> Isosceles
+    (True, 3) -> Scalene
+    _         -> Illegal
 
 
-verify :: (Num a, Ord a) => [a] -> Maybe [a]
-verify xs = case xs of
-  [a, b, c] -> xs <$ guard (a + b > c)
-  _         -> Nothing
-
-categorize :: (Num a, Ord a) => [a] -> Maybe TriangleType
-categorize xs = case length $ group xs of
-  1 -> pure Equilateral
-  2 -> pure Isosceles
-  3 -> pure Scalene
-  _ -> Nothing
+isLegal :: (Num a, Ord a) => [a] -> Bool
+isLegal xs = case xs of
+  [a, b, c] -> a + b > c
+  _         -> False
