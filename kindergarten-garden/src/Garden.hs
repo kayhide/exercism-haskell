@@ -1,16 +1,14 @@
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE ViewPatterns #-}
 module Garden
     ( Plant (..)
     , garden
     , lookupPlants
     ) where
 
-import Control.Arrow (first)
+import Data.Bool (bool)
 import Data.List (transpose, unfoldr)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Maybe (fromMaybe)
 
 
 data Plant = Clover
@@ -36,7 +34,7 @@ garden students plants = Map.fromList $ zip students plants'
       _ -> error "Unknown plant"
 
 lookupPlants :: String -> Garden -> [Plant]
-lookupPlants student = fromMaybe [] . Map.lookup student
+lookupPlants = Map.findWithDefault []
 
 
 chunksOf :: Int -> [a] -> [[a]]
@@ -44,5 +42,4 @@ chunksOf n = unfoldr splitAt'
   where
     splitAt' :: [a] -> Maybe ([a], [a])
     splitAt' xs = case splitAt n xs of
-      res@(length -> 2, _) -> Just res
-      _                    -> Nothing
+      res@(xs', _) -> bool Nothing (Just res) $ length xs' == n
