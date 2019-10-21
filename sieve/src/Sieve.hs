@@ -1,18 +1,18 @@
-{-# LANGUAGE LambdaCase #-}
 module Sieve (primesUpTo) where
 
 -- You should not use any of the division operations when implementing
 -- the sieve of Eratosthenes.
 import Prelude hiding (div, divMod, mod, quot, quotRem, rem, (/))
 
-import Data.List (find, (\\))
+import qualified Data.Set as Set
+import Data.Set (Set, lookupGT, (\\))
 
 
 primesUpTo :: Integer -> [Integer]
-primesUpTo n = f 2 [2 .. n]
+primesUpTo n = Set.toList $ f 2 $ Set.fromList [2 .. n]
   where
-    f :: Integer -> [Integer] -> [Integer]
-    f x xs = maybe id f =<< find (x <) $ sieve x xs
+    f :: Integer -> Set Integer -> Set Integer
+    f x xs = maybe id f =<< lookupGT x $ sieve x xs
 
-    sieve :: Integer -> [Integer] -> [Integer]
-    sieve x = (\\ [x * 2, x * 3 .. n])
+    sieve :: Integer -> Set Integer -> Set Integer
+    sieve x = (\\ Set.fromList [x * 2, x * 3 .. n])
