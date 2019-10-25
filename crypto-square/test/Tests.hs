@@ -24,6 +24,7 @@ specs = describe "encode" $ for_ cases test
       it "normalizes the input"    $ encode input `shouldMatchChars`  expected
       it "reorders the characters" $ encode input `shouldMatchString` expected
       it "groups the output"       $ encode input `shouldMatchWords`  expected
+      it "adds trailing spaces"    $ encode input `shouldBe`          expected
 
 data Case = Case { description :: String
                  , input       :: String

@@ -7,7 +7,7 @@ import Data.List (splitAt, transpose, unfoldr)
 
 
 encode :: String -> String
-encode xs = unwords . transpose . chunksOf cols $ fmap toLower xs'
+encode xs = unwords . transpose . fmap pad . chunksOf cols $ fmap toLower xs'
   where
     xs' :: String
     xs' = filter (\c -> isAlpha c || isDigit c) xs
@@ -17,6 +17,9 @@ encode xs = unwords . transpose . chunksOf cols $ fmap toLower xs'
 
     cols :: Int
     cols = rows + bool 0 1 (rows * rows < length xs')
+
+    pad :: String -> String
+    pad s = s <> replicate (cols - length s) ' '
 
 
 sqrt' :: Int -> Float
