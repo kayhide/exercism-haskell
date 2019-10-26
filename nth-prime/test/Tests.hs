@@ -6,6 +6,7 @@ import Test.Hspec        (Spec, describe, it, shouldBe)
 import Test.Hspec.Runner (configFastFail, defaultConfig, hspecWith)
 
 import Prime (nth)
+-- import PrimeSlow (nth)
 
 main :: IO ()
 main = hspecWith defaultConfig {configFastFail = True} specs
