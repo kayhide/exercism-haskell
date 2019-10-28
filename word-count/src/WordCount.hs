@@ -1,18 +1,19 @@
+{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE TupleSections #-}
 module WordCount (wordCount) where
 
-import Control.Arrow ((&&&))
-import Data.Bool (bool)
 import Data.Char (isAlphaNum, toLower)
-import Data.List (group, sort, tails)
+import Data.List (tails)
+import qualified Data.Map as Map
 
 
 wordCount :: String -> [(String, Int)]
-wordCount xs = fmap (head &&& length) . group .  sort $ words' xs
+wordCount = Map.toList . Map.fromListWith (+) . fmap (, 1) . words'
 
 words' :: String -> [String]
-words' str = words $ fmap f . takeWhile (not . null) $ tails (' ' : str)
+words' = words . fmap f . takeWhile (not . null) . tails . (' ' :)
   where
     f :: String -> Char
-    f (x : '\'' : y : _) = bool ' ' '\'' $ isAlphaNum x && isAlphaNum y
-    f (_ : c : _)        = bool ' ' (toLower c) $ isAlphaNum c
-    f _                  = ' '
+    f (_ : c@(isAlphaNum -> True) : _)                           = toLower c
+    f ((isAlphaNum -> True) : c@'\'' : (isAlphaNum -> True) : _) = c
+    f _                                                          = ' '
