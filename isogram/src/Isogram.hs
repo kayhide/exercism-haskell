@@ -1,14 +1,18 @@
 module Isogram (isIsogram) where
 
-import           Control.Arrow ((&&&))
-import           Data.Bits     (bit, zeroBits, (.|.))
-import           Data.Char     (isAlpha, ord, toLower)
+import Control.Arrow ((&&&))
+import Data.Bits (bit, zeroBits, (.|.))
+import Data.Char (isAlpha, isAscii, ord, toLower)
 
 isIsogram :: String -> Bool
-isIsogram = isOrdered . scanl (.|.) zeroBits . toBits . filter isAlpha
+isIsogram =
+  isStrictlyIncreasing
+  . scanl (.|.) zeroBits
+  . toBits
+  . filter ((&&) <$> isAlpha <*> isAscii)
 
-isOrdered :: [Int] -> Bool
-isOrdered = and . uncurry (zipWith (<)) . (id &&& tail)
+isStrictlyIncreasing :: [Int] -> Bool
+isStrictlyIncreasing = and . uncurry (zipWith (<)) . (id &&& tail)
 
 toBits :: String -> [Int]
 toBits = map (bit . subtract (ord 'a') . ord . toLower)
