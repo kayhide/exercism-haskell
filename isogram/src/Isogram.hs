@@ -1,18 +1,19 @@
 module Isogram (isIsogram) where
 
-import Control.Arrow ((&&&))
+import Control.Monad (foldM, guard)
 import Data.Bits (bit, zeroBits, (.|.))
 import Data.Char (isAlpha, isAscii, ord, toLower)
+import Data.Maybe (isJust)
 
 isIsogram :: String -> Bool
 isIsogram =
-  isStrictlyIncreasing
-  . scanl (.|.) zeroBits
+  isJust
+  . foldM f zeroBits
   . toBits
   . filter ((&&) <$> isAlpha <*> isAscii)
-
-isStrictlyIncreasing :: [Int] -> Bool
-isStrictlyIncreasing = and . uncurry (zipWith (<)) . (id &&& tail)
+  where
+    f :: Int -> Int -> Maybe Int
+    f acc x = acc .|. x <$ guard (acc < acc .|. x)
 
 toBits :: String -> [Int]
 toBits = map (bit . subtract (ord 'a') . ord . toLower)
