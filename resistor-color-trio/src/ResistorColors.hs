@@ -1,5 +1,7 @@
 module ResistorColors (Color(..), Resistor(..), label, ohms) where
 
+import Control.Arrow ((***))
+
 data Color =
     Black
   | Brown
@@ -17,8 +19,9 @@ newtype Resistor = Resistor { bands :: (Color, Color, Color) }
   deriving Show
 
 label :: Resistor -> String
-label resistor = case last $ zip vs units of
-  (v, u) -> unwords [show v, u]
+label resistor =
+  uncurry (<>) . (show *** (' ' :)) . last $ zip vs units
+
   where
   vs :: [Int]
   vs = 0 : (takeWhile (0 <) . iterate (`div` 1000) $ ohms resistor)
@@ -28,7 +31,7 @@ label resistor = case last $ zip vs units of
 
 
 ohms :: Resistor -> Int
-ohms resistor = sig resistor * ex resistor
+ohms = (*) <$> sig <*> ex
 
 
 sig :: Resistor -> Int
