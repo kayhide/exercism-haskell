@@ -16,9 +16,8 @@ main = do
   defaultMain $ benchGroup <$> cases
   where
 
-    cases = [
-      -- ("palindromes from single digit factors",     1,     9)
-      --       , ("palindromes from double digit factors",    10,    99)
-             ("palindromes from triple digit factors",   100,   999)
-            -- , ("palindromes from four digit factors"  ,  1000,  9999)
+    cases = [ ("palindromes from single digit factors",     1,     9)
+            , ("palindromes from double digit factors",    10,    99)
+            , ("palindromes from triple digit factors",   100,   999)
+            , ("palindromes from four digit factors"  ,  1000,  9999)
             ]
