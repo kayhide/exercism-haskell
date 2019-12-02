@@ -11,5 +11,7 @@ sublist xs ys =
     (False, True) -> Just GT
     _             -> Nothing
 
+-- | I found this implementation is actually the same to `Data.List.isInfix`.
+--   http://hackage.haskell.org/package/base-4.12.0.0/docs/src/Data.OldList.html#isInfixOf
 isSublistOf :: Eq a => [a] -> [a] -> Bool
 isSublistOf xs = any (xs `isPrefixOf`) . tails
