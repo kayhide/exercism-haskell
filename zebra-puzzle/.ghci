@@ -1,0 +1,9 @@
+:set -XDataKinds
+:set -XFlexibleContexts
+:set -XFlexibleInstances
+:set -XFunctionalDependencies
+:set -XMultiParamTypeClasses
+:set -XOverloadedLabels
+:set -XTemplateHaskell
+:set -XTypeFamilies
+:set -XUndecidableInstances

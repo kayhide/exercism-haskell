@@ -1,0 +1,6 @@
+
+[N] [Yellow] [Fox] [Water] [Kools]
+[U] [Blue] [Horse] [Tea] [Chesterfields]
+[E] [Red] [Snails] [Milk] [OldGold]
+[S] [Ivory] [Dog] [OrangeJuice] [LuckyStrike]
+[J] [Green] [Zebra] [Coffee] [Parliaments]
