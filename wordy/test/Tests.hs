@@ -116,4 +116,8 @@ cases = [ Case { description = "just a number"
                , input       = "What is plus 1 2?"
                , expected    = Nothing
                }
+        , Case { description = "bonus — exponentials"
+               , input       = "What is 2 raised to the 5th power?"
+               , expected    = Just 32
+               }
         ]
