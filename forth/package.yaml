@@ -1,0 +1,23 @@
+name: forth
+version: 1.7.1.12
+
+dependencies:
+  - base
+  - text
+  - containers
+
+library:
+  exposed-modules: Forth
+  source-dirs: src
+  ghc-options: -Wall
+  # dependencies:
+  # - foo       # List here the packages you
+  # - bar       # want to use in your solution.
+
+tests:
+  test:
+    main: Tests.hs
+    source-dirs: test
+    dependencies:
+      - forth
+      - hspec
