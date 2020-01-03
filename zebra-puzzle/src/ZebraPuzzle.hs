@@ -5,8 +5,10 @@ import Control.Monad (guard)
 import Control.Monad.Fix (fix)
 import Data.Bool (bool)
 import Data.Function (on)
-import Data.List (delete, find, groupBy, intersect, sortOn, (\\))
+import Data.List (find, groupBy, sortOn)
 import Data.Maybe (catMaybes, fromMaybe, listToMaybe)
+import Data.Set (Set, (\\))
+import qualified Data.Set as Set
 import Optics (Prism', filtered, itoListOf, itraversed, ix, over, prism, to,
                traversed, (%), (%~), (&), (^..), (^?), _Just, _head)
 
@@ -21,10 +23,11 @@ data Item
   | Dog | Snails | Fox | Horse | Zebra
   | Coffee | Tea | Milk | OrangeJuice | Water
   | OldGold | Chesterfields | Kools | LuckyStrike | Parliaments
-  deriving (Eq, Show, Enum, Bounded)
+  deriving (Eq, Show, Ord, Enum, Bounded)
 
-groups :: [[Item]]
+groups :: [Set Item]
 groups =
+  Set.fromList <$>
   [ [E .. J]
   , [Red .. Blue]
   , [Dog .. Zebra]
@@ -32,13 +35,13 @@ groups =
   , [OldGold .. Parliaments]
   ]
 
-group :: Item -> [Item]
-group x = fromMaybe (error "Bad Item") $ find (elem x) groups
+group :: Item -> Set Item
+group x = fromMaybe (error "Bad Item") $ find (Set.member x) groups
 
-toGroups :: Slot -> [[Item]]
-toGroups = groupBy ((==) `on` group)
+toGroups :: Slot -> [Set Item]
+toGroups = fmap Set.fromAscList . groupBy ((==) `on` group) . Set.elems
 
-type Slot = [Item]
+type Slot = Set Item
 type Fact = [Slot]
 
 data Solution =
@@ -49,9 +52,9 @@ data Solution =
 
 solve :: Solution
 solve = fromMaybe (error "No solution") $ do
-  fact <- listToMaybe $ go $ replicate 5 $ concat groups
-  waterDrinker <- find (elem Water) fact ^? _Just % _head % to fromEnum % to toEnum
-  zebraOwner <- find (elem Zebra) fact ^? _Just % _head % to fromEnum % to toEnum
+  fact <- listToMaybe $ go $ replicate 5 $ Set.unions groups
+  waterDrinker <- find (elem Water) fact ^? _Just % to Set.elems % _head % to (toEnum . fromEnum)
+  zebraOwner <- find (elem Zebra) fact ^? _Just % to Set.elems % _head % to (toEnum . fromEnum)
   pure Solution {..}
 
 
@@ -63,8 +66,8 @@ go fact
       (i, xs) <-
         sortOn (length . snd)
         $ itoListOf (itraversed % to toGroups % traversed % filtered ((1 <) . length)) fact'
-      x <- xs
-      go $ fact' & ix i %~ (\\ delete x (group x))
+      x <- Set.elems xs
+      go $ fact' & ix i %~ place x
   where
     fact' :: Fact
     fact' = fix (\rec x ->
@@ -72,12 +75,12 @@ go fact
                 ) fact
 
 isSolved :: Fact -> Bool
-isSolved fact = length (concat groups) == length (concat fact)
+isSolved fact = sum (length <$> groups) == sum (length <$> fact)
 
 isPossible :: Fact -> Bool
 isPossible fact =
-  all (not . null) (intersect <$> groups <*> fact)
-  && null (concat groups \\ concat fact)
+  all (not . null) (Set.intersection <$> groups <*> fact)
+  && null (Set.unions groups \\ Set.unions fact)
 
 step :: Fact -> Fact
 step fact = foldr ($) fact clues
@@ -103,7 +106,7 @@ clues =
 
 
 place :: Item -> Slot -> Slot
-place x = (\\ delete x (group x))
+place x = (\\ Set.delete x (group x))
 
 meet :: Item -> Item -> Fact -> Fact
 meet x y = unify [0] x y
@@ -139,31 +142,31 @@ neg ds x y fact = foldr f fact [0 .. length fact - 1]
     f i fact' = fromMaybe fact' $ do
       let ixs = catMaybes $ (\j -> j <$ fact' ^? ix j % including y) <$> (i +) <$> ds
       guard $ null ixs
-      pure $ fact' & ix i %~ delete x
+      pure $ fact' & ix i %~ Set.delete x
 
 sweep :: Fact -> Fact
 sweep fact = foldr f fact groups
   where
-    f :: [Item] -> Fact -> Fact
+    f :: Slot -> Fact -> Fact
     f xs fact' =
       fact'
       & traversed % multiple xs
-      %~ (\\ (intersect xs $ fact ^.. traversed % single xs % traversed))
+      %~ (\\ (Set.intersection xs $ Set.unions $ fact ^.. traversed % single xs))
 
 
 -- * Prisms for Slot and Item
 
 exactly :: Item -> Prism' Slot Slot
-exactly x = filtering $ (== pure x) . intersect (group x)
+exactly x = filtering $ (== Set.singleton x) . Set.intersection (group x)
 
 including :: Item -> Prism' Slot Slot
 including x = filtering $ elem x
 
-single :: Eq a => [a] -> Prism' [a] [a]
-single xs = filtering $ (1 ==) . length . intersect xs
+single :: Set Item -> Prism' Slot Slot
+single xs = filtering $ (1 ==) . length . Set.intersection xs
 
-multiple :: Eq a => [a] -> Prism' [a] [a]
-multiple xs = filtering $ (1 <) . length . intersect xs
+multiple :: Set Item -> Prism' Slot Slot
+multiple xs = filtering $ (1 <) . length . Set.intersection xs
 
 filtering :: (a -> Bool) -> Prism' a a
 filtering p = prism id (bool Left Right =<< p)
