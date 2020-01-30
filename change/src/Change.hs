@@ -1,11 +1,10 @@
 module Change (findFewestCoins) where
 
+import Data.Maybe (listToMaybe)
+
 
 findFewestCoins :: Integer -> [Integer] -> Maybe [Integer]
-findFewestCoins target coins =
-  case candidates target coins of
-    []    -> Nothing
-    x : _ -> pure x
+findFewestCoins target coins = listToMaybe $ candidates target coins
 
 candidates :: Integer -> [Integer] -> [[Integer]]
 candidates _ [] = []
